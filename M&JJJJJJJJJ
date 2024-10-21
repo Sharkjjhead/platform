@@ -1,0 +1,205 @@
+import pygame
+pygame.init()  
+pygame.display.set_caption("easy platformer")  # sets the window title
+screen = pygame.display.set_mode((800, 800))  # creates game screen
+screen.fill((0,0,0))
+clock = pygame.time.Clock() #set up clock
+gameover = False #variable to run our game loop
+
+#CONSTANTS
+LEFT=0
+RIGHT=1
+UP = 2
+DOWN = 3
+a = 4
+w = 5
+d = 6
+s = 7
+WHITE = (255,255,255)
+YELLOW = (255,221,33)
+#player variables
+xpos = 500 #xpos of player
+ypos = 200 #ypos of player
+x2pos = 500 #xpos of player
+y2pos = 300 #ypos of player
+vx = 0 #x velocity of player
+vy = 0 #y velocity of player
+v2x = 0 #x velocity of player
+v2y = 0 #y velocity of player
+keys = [False, False, False, False, False, False, False, False] #this list holds whether each key has been pressed
+isOnGround = False #this variable stops gravity from pulling you down more when on a platform
+isOnGround2 = False #this variable stops gravity from pulling you down more when on a platform
+
+while not gameover: #GAME LOOP############################################################
+    clock.tick(60) #FPS
+    
+    #Input Section------------------------------------------------------------
+    for event in pygame.event.get(): #quit game if x is pressed in top corner
+        if event.type == pygame.QUIT:
+            gameover = True
+            
+        
+      
+        if event.type == pygame.KEYDOWN: #looks for key presses
+            if event.key == pygame.K_LEFT:
+                keys[LEFT]=True
+                  
+
+         
+            if event.key == pygame.K_UP:
+                keys[UP]=True
+                
+                
+            if event.key == pygame.K_RIGHT:
+                keys[RIGHT]=True
+      
+            if event.key == pygame.K_a:
+                keys[a]=True
+                  
+
+         
+            if event.key == pygame.K_w:
+                keys[w]=True
+                
+                
+            if event.key == pygame.K_d:
+                keys[d]=True
+                
+
+        elif event.type == pygame.KEYUP: #looks for key releases
+            if event.key == pygame.K_LEFT:
+                keys[LEFT]=False
+
+            elif event.key == pygame.K_UP:
+                keys[UP]=False
+                
+            elif event.key == pygame.K_RIGHT:
+                keys[RIGHT]=False
+                
+            elif event.key == pygame.K_a:
+                keys[a]=False
+
+            elif event.key == pygame.K_w:
+                keys[w]=False
+                
+            elif event.key == pygame.K_d:
+                keys[d]=False
+
+
+    #physics section--------------------------------------------------------------------
+    #LEFT MOVEMENT
+    if keys[LEFT]==True:
+        vx=-3
+        
+    elif keys[RIGHT]==True:
+        vx=3
+        
+    else:
+        vx = 0
+    
+    if keys[a]==True:
+        v2x=-3
+        
+    elif keys[d]==True:
+        v2x=3
+
+    else:
+        v2x = 0
+        #JUMPING
+    if keys[UP] == True and isOnGround == True: #only jump when on the ground
+        vy = -8
+        isOnGround = False
+
+        
+    if keys[w] == True and isOnGround2 == True: #only jump when on the ground
+        v2y = 8
+        isOnGround2 = False
+
+    
+        pygame.mixer.music.load('jump.mp3.mp3')
+        pygame.mixer.music.play(-1)
+
+    
+    #COLLISION
+    if xpos>100 and xpos<200 and ypos+40 >750 and ypos+40 <770:
+        ypos = 750-40
+        isOnGround = True
+        vy = 0
+    elif xpos>200 and xpos<300 and ypos+40 >650 and ypos+40 <670:
+        ypos = 650-40
+        isOnGround = True
+        vy = 0
+    elif xpos>400 and xpos<500 and ypos+40 >500 and ypos+40 <530:
+        ypos = 500-40
+        isOnGround = True
+        vy = 0
+
+    else:
+        isOnGround2 = False
+        
+    if x2pos>100 and x2pos<200 and y2pos+40 >750 and y2pos+40 <770:
+        y2pos = 750-40
+        isOnGround2 = True
+        v2y = 0
+    elif x2pos>200 and x2pos<300 and y2pos+40 >650 and y2pos+40 <670:
+        y2pos = 650-40
+        isOnGround2 = True
+        v2y = 0
+    elif x2pos>400 and x2pos<500 and y2pos+40 >500 and y2pos+40 <530:
+        y2pos = 500-40
+        isOnGround2 = True
+        v2y = 0
+
+    else:
+        isOnGround2 = False
+
+
+    
+    #stop falling if on bottom of game screen
+    if ypos > 760:
+        isOnGround = True
+        vy = 0
+        ypos = 760
+        
+    if y2pos < 0:
+        isOnGround2 = True
+        v2y = 0
+        y2pos = 0
+
+    
+    #gravity
+    if isOnGround == False:
+        vy+=.2 #notice this grows over time, aka ACCELERATION
+        
+    if isOnGround2 == False:
+        v2y-=.2 #notice this grows over time, aka ACCELERATION
+    #update player position
+    xpos+=vx 
+    ypos+=vy
+    
+    x2pos+=v2x 
+    y2pos+=v2y
+
+    pygame.mixer.music.load('RETRO.mp3.mp3')
+    pygame.mixer.music.play(-1)
+  
+    # RENDER Section----------------------------------
+            
+    screen.fill((135,206,235)) #wipe screen so it doesn't smear
+    
+    pygame.draw.ellipse(screen, YELLOW, (90,50,200,200))
+    #player
+    pygame.draw.rect(screen, (200, 0, 10), (xpos, ypos, 20,40))
+    #PLAYER2
+    pygame.draw.rect(screen, (200, 0, 10), (x2pos, y2pos, 20,40))
+    
+    #platforms
+    pygame.draw.rect(screen, (200, 0, 10), (100, 750, 100, 20))
+    pygame.draw.rect(screen, (200, 0, 20), (200, 650, 100, 20))
+    pygame.draw.rect(screen, (200, 0, 20), (400, 500, 100, 20))
+ 
+    pygame.display.flip()#this actually puts the pixel on the screen
+    
+#end game loop------------------------------------------------------------------------------
+
+pygame.quit()
